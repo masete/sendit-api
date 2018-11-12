@@ -9,7 +9,7 @@ parcel_blueprint = Blueprint("parcel", __name__)
 @parcel_blueprint.route('/api/v1/parcel', methods=['POST'], strict_slashes=False)
 def create_parcel():
     if request.content_type != "application/json":
-        raise InvalidUsage("Invalid content type..--...gkjljlkjlkj.", 400)
+        raise InvalidUsage("Invalid content type", 400)
     data = request.get_json()
     parcel_id = len(Parcel.parcel_orders) + 1
     parcel_location = data.get('parcel_location')
@@ -32,3 +32,10 @@ def create_parcel():
     order = Parcel(parcel_id, parcel_location, parcel_destination, parcel_weight, parcel_description, user_id, status)
     Parcel.parcel_orders.append(order.to_dict() )
     return jsonify({"message": "parcel successfully added ", "parcel": order.to_dict()}), 201
+
+
+@parcel_blueprint.route('/api/v1/parcel', methods=['GET'], strict_slashes=False)
+def get_all_parcel():
+    if not Parcel.parcel_orders:
+        return jsonify({"message": "List is empty first post"})
+    return jsonify({"orders": Parcel.parcel_orders})
