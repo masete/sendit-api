@@ -47,3 +47,12 @@ def get_single_parcel(parcel_id):
         if order['parcel_id'] == parcel_id:
             return jsonify({"message": "your request is successfull", "data": order}), 200
     return jsonify({"message": "there is no such id"}), 400
+
+
+@parcel_blueprint.route('/api/v1/parcel/<int:parcel_id>/cancel', methods=['PUT'], strict_slashes=False)
+def cancel_parcel(parcel_id):
+    for order in Parcel.parcel_orders:
+        if order['parcel_id'] == parcel_id:
+            order['status'] = 'cancelled'
+            return jsonify(order), 200
+    return jsonify({"message": "there is no such id"}), 400
