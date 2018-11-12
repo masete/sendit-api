@@ -56,3 +56,10 @@ def cancel_parcel(parcel_id):
             order['status'] = 'cancelled'
             return jsonify(order), 200
     return jsonify({"message": "the parcel does not exist"}), 400
+
+
+@parcel_blueprint.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
