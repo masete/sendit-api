@@ -55,4 +55,4 @@ def cancel_parcel(parcel_id):
         if order['parcel_id'] == parcel_id:
             order['status'] = 'cancelled'
             return jsonify(order), 200
-    return jsonify({"message": "there is no such id"}), 400
+    return jsonify({"message": "the parcel does not exist"}), 400
