@@ -31,4 +31,4 @@ def create_parcel():
 
     order = Parcel(parcel_id, parcel_location, parcel_destination, parcel_weight, parcel_description, user_id, status)
     Parcel.parcel_orders.append(order.to_dict() )
-    return jsonify({"message": "parcel successfully added ", "data": order.to_dict()}), 201
+    return jsonify({"message": "parcel successfully added ", "parcel": order.to_dict()}), 201
