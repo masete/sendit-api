@@ -22,6 +22,22 @@ def signup():
     return jsonify({"message": "user added"})
 
 
+@user_blueprint.route('/api/auth/login', methods=['POST'], strict_slashes=False)
+def login():
+
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    for user in Users.users_list:
+        if not user['username'] == username:
+            return jsonify({"message": "wrong username"})
+        if not user['password'] == password:
+            return jsonify({"message": "wrong password"})
+
+    return jsonify({"message": "you are now logged in"})
+
+
 @parcel_blueprint.route('/api/v1/parcel', methods=['POST'], strict_slashes=False)
 def create_parcel():
     if request.content_type != "application/json":
