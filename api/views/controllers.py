@@ -4,6 +4,7 @@ from api.validations import empty_order_fields, invalid_input_types, empty_strin
 from api.Handlers.error_handlers import InvalidUsage
 
 parcel_blueprint = Blueprint("parcel", __name__)
+user_blueprint = Blueprint("user", __name__)
 
 
 @parcel_blueprint.route('/api/v1/parcel', methods=['POST'], strict_slashes=False)
@@ -38,7 +39,7 @@ def create_parcel():
 def get_all_parcel():
     if not Parcel.parcel_orders:
         return jsonify({"message": "List is empty first post"})
-    return jsonify({"orders": Parcel.parcel_orders})
+    return jsonify({"parcels": Parcel.parcel_orders})
 
 
 @parcel_blueprint.route('/api/v1/parcel/<int:parcel_id>', methods=['GET'], strict_slashes=False)
@@ -46,7 +47,7 @@ def get_single_parcel(parcel_id):
     for order in Parcel.parcel_orders:
         if order['parcel_id'] == parcel_id:
             return jsonify({"message": "your request is successfull", "data": order}), 200
-    return jsonify({"message": "there is no such id"}), 400
+    return jsonify({"message": "there is no parcel requested for"}), 400
 
 
 @parcel_blueprint.route('/api/v1/parcel/<int:parcel_id>/cancel', methods=['PUT'], strict_slashes=False)
