@@ -1,10 +1,25 @@
 from flask import Blueprint, jsonify, request
-from api.models.models import Parcel
+from api.models.models import Parcel, Users
 from api.validations import empty_order_fields, invalid_input_types, empty_strings_add_weight
 from api.Handlers.error_handlers import InvalidUsage
+import uuid
 
 parcel_blueprint = Blueprint("parcel", __name__)
 user_blueprint = Blueprint("user", __name__)
+
+
+@user_blueprint.route('/api/auth/signup', methods=['POST'], strict_slashes=False)
+def signup():
+    data = request.get_json()
+    user_id = uuid.uuid4()
+    username = data['username']
+    password = data['password']
+    email = data['email']
+
+    signup_data = Users(user_id, username, password, email)
+
+    Users.users_list.append(signup_data.to_dict())
+    return jsonify({"message": "user added"})
 
 
 @parcel_blueprint.route('/api/v1/parcel', methods=['POST'], strict_slashes=False)
