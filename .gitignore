@@ -6,3 +6,12 @@
 /__pycache__/
 /tests/test_views.py
 /tests/__pycache__/
+/api/Handlers/__init__.pyc
+/api/Handlers/error_handlers.pyc
+/api/__init__.pyc
+/api/models/__init__.py
+/api/models/models.pyc
+/api/validations.pyc
+/api/views/__init__.pyc
+/api/views/controllers.pyc
+/api/models/__init__.pyc
