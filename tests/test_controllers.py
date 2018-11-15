@@ -2,17 +2,17 @@ import unittest
 import json
 
 from run import create_app
-from api.models.models import Parcel
+from api.models.models import Parcel, parcel_orders
 
 
 class TestEndpoints(unittest.TestCase):
     def setUp(self):
         app = create_app()
         self.app = app.test_client()
-        self.parcel_orders = Parcel.parcel_orders
+        self.parcel_orders = parcel_orders
 
     def test_data_structure(self):
-        self.assertTrue(isinstance(Parcel.parcel_orders, list))
+        self.assertTrue(isinstance(parcel_orders, list))
 
     def test_create_parcel(self):
         post_order = dict(parcel_location="kisumu", parcel_destination="meru", parcel_weight=48,
