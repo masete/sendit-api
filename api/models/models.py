@@ -1,6 +1,7 @@
+parcel_orders = []
+
 
 class Parcel:
-    parcel_orders = []
 
     def __init__(self, parcel_id, parcel_location, parcel_destination, parcel_weight, parcel_description, user_id,status):
         self.parcel_id = parcel_id
@@ -25,8 +26,10 @@ class Parcel:
         return parcel
 
 
+users_list = []
+
+
 class Users:
-    users_list = []
 
     def __init__(self, user_id, username, password, email):
         self.user_id = user_id

@@ -144,6 +144,23 @@ class TestEndpoints(unittest.TestCase):
         assert response2.status_code == 404
         assert response1.headers["Content-Type"] == "application/json"
 
+    def test_parcel_by_user_id(self):
+        response = self.app.post('/api/v1/parcel')
+        response1 = self.app.get('/api/v1/users/1/parcel')
+        response2 = self.app.get('/api/v1/users/w/parcel')
+        assert response1.status_code == 200
+        assert response2.status_code == 404
+        assert response1.headers["Content-Type"] == "application/json"
+
+    def test_cancel_parcel(self):
+        response = self.app.post('/api/v1/parcel')
+        response2 = self.app.get('/api/v1/parcel/h/cancel')
+        assert response2.status_code == 404
+
+
+
+
+
 
 
 
