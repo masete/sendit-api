@@ -1,7 +1,11 @@
 from flask import Blueprint, jsonify, request
-from api.models.models import Parcel, parcel_orders , Users, users_list
+from api.models.models import Parcel, parcel_orders, Users, users_list
 from api.validations import empty_order_fields, invalid_input_types, empty_strings_add_weight
 from api.Handlers.error_handlers import InvalidUsage
+from werkzeug.security import check_password_hash, generate_password_hash
+import jwt
+from functools import wraps
+import datetime
 import uuid
 
 
@@ -9,18 +13,40 @@ parcel_blueprint = Blueprint("parcel", __name__)
 user_blueprint = Blueprint("user", __name__)
 
 
+def token_req(end_point):
+    @wraps(end_point)
+    def check(*args, **kwargs):
+        if 'token' in request.headers:
+            tk = request.headers['token']
+        else:
+            return jsonify({'message': 'you should login'})
+        try:
+            jwt.decode(tk, 'masete_nicholas_scretekey')
+        except:
+            return jsonify({'message': 'user not authenticated'})
+        return end_point(*args, **kwargs)
+    return check
+
+
 @user_blueprint.route('/api/auth/signup', methods=['POST'], strict_slashes=False)
 def signup():
     data = request.get_json()
     user_id = uuid.uuid4()
     username = data.get('username')
-    password = data.get('password')
+    password = generate_password_hash('password', method='sha256')
     email = data.get('email')
 
     signup_data = Users(user_id, username, password, email)
 
     users_list.append(signup_data.to_dict())
     return jsonify({"message": "user added"})
+
+
+@user_blueprint.route('/api/v1/user', methods=['GET'])
+def get_all_users():
+    if not users_list:
+        return jsonify({"message": "there are no users currently"})
+    return jsonify({"users": users_list})
 
 
 @user_blueprint.route('/api/auth/login', methods=['POST'], strict_slashes=False)
@@ -33,13 +59,18 @@ def login():
     for user in users_list:
         if not user['username'] == username:
             return jsonify({"message": "wrong username"})
-        if not user['password'] == password:
+        if not check_password_hash(user['password'], 'password'):
             return jsonify({"message": "wrong password"})
 
-    return jsonify({"message": "you are now logged in"})
+    tk = jwt.encode({
+        'username': user['username'],
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+    }, 'masete_nicholas_scretekey')
+    return jsonify({"message": "you are now logged in", 'token': tk.decode('UTF-8')})
 
 
 @parcel_blueprint.route('/api/v1/parcel', methods=['POST'], strict_slashes=False)
+@token_req
 def create_parcel():
 
     if request.content_type != "application/json":
@@ -69,6 +100,7 @@ def create_parcel():
 
 
 @parcel_blueprint.route('/api/v1/parcel', methods=['GET'], strict_slashes=False)
+@token_req
 def get_all_parcel():
     if not parcel_orders:
         return jsonify({"message": "List is empty first post"})
@@ -76,6 +108,7 @@ def get_all_parcel():
 
 
 @parcel_blueprint.route('/api/v1/parcel/<int:parcel_id>', methods=['GET'], strict_slashes=False)
+@token_req
 def get_single_parcel(parcel_id):
     for order in parcel_orders:
         if order['parcel_id'] == parcel_id:
@@ -84,6 +117,7 @@ def get_single_parcel(parcel_id):
 
 
 @parcel_blueprint.route('/api/v1/parcel/<int:parcel_id>/cancel', methods=['PUT'], strict_slashes=False)
+@token_req
 def cancel_parcel(parcel_id):
     for order in parcel_orders:
         if order['parcel_id'] == parcel_id:
@@ -93,6 +127,7 @@ def cancel_parcel(parcel_id):
 
 
 @parcel_blueprint.route('/api/v1/users/<int:user_id>/parcel', methods=['GET'], strict_slashes=False)
+@token_req
 def get_parcel_by_user_id(user_id):
     single = []
     for order in parcel_orders:
